@@ -77,7 +77,11 @@ jobs:
       - name: Build QEMU
         working-directory: qemu
         run: |
-          ./configure --target-list="aarch64-softmmu,x86_64-softmmu" --enable-fdt --enable-plugins --enable-slirp --enable-capstone
+          #./configure --target-list="aarch64-softmmu,x86_64-softmmu" --enable-fdt --enable-plugins --enable-slirp --enable-capstone
+          ./configure --target-list="aarch64-softmmu,x86_64-softmmu" \
+            --enable-fdt --enable-plugins --enable-slirp --enable-capstone \
+            --disable-debug-info \
+            --disable-dbus-display --disable-alsa --disable-curses --disable-gtk --disable-dsound --disable-vnc --disable-debug-info --disable-kvm --disable-xen
           make -j $(cat /proc/cpuinfo | grep "^processor" | wc -l)
           make plugins
           #make check-build
