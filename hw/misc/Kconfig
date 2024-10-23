@@ -215,7 +215,6 @@ config XLNX_VERSAL_TRNG
 
 config WR_PCI_LEDS
     bool
-    default y if PCI_DEVICES
-    depends on PCI
+    default y
 
 source macio/Kconfig
