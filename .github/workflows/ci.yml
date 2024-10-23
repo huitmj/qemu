@@ -20,10 +20,10 @@ name: WR QEMU CI
 on:
   push:
     branches:
-      - wr-integration
+      - rhone
   pull_request:
     branches:
-      - wr-integration
+      - rhone
 
 jobs:
   build:
