@@ -32,10 +32,10 @@ jobs:
       - name: Checkout QEMU source
         uses: actions/checkout@v4
         with:
-          repository: Wind-River/qemu
+          repository: huitmj/qemu
           path: qemu
           # Use a specific branch or tag if needed
-          ref: wr-integration
+          ref: rhone
 
       - name: Set up dependencies
         run: |
