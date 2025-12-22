@@ -1,0 +1,102 @@
+# ci.yml, WR QEMU github CI configuration file.
+#
+# Copyright (c) 2024 Wind River Systems, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+name: James QEMU Build
+
+on:
+  push:
+    branches:
+      - build
+  pull_request:
+    branches:
+      - build
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout QEMU source
+        uses: actions/checkout@v4
+        with:
+          repository: huitmj/qemu
+          path: qemu
+          # Use a specific branch or tag if needed
+          ref: build
+
+      - name: Set up dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            autoconf \
+            automake \
+            bison \
+            bzip2 \
+            build-essential \
+            cmake \
+            curl \
+            flex \
+            git \
+            lftp \
+            libaio-dev \
+            libcapstone-dev \
+            libelf1 \
+            libfdt-dev \
+            libglib2.0-dev \
+            libncurses5-dev \
+            libpixman-1-dev \
+            libslirp-dev \
+            libx11-6 \
+            libxext6 \
+            libxpm4 \
+            libz-dev \
+            make \
+            ninja-build \
+            python3 \
+            python3-pip \
+            screen \
+            texinfo \
+            unzip \
+            vsftpd \
+            wget \
+            zlib1g-dev
+
+      - name: Build QEMU
+        working-directory: qemu
+        run: |
+          ./configure --target-list="arm-softmmu,aarch64-softmmu,x86_64-softmmu" \
+            --enable-fdt --enable-slirp --enable-capstone \
+            --disable-debug-info --without-default-features \
+            --static
+          make -j $(cat /proc/cpuinfo | grep "^processor" | wc -l)
+          make plugins
+          #make check-build
+
+      - name: Run QEMU tests
+        working-directory: qemu
+        run: |
+          #make check
+
+      - name: Store QEMU binaries
+        if: always() 
+        uses: actions/upload-artifact@v4
+        with: 
+          name: wr_qemu_bin-${{ github.run_number }}-${{ github.sha }}
+          path: | 
+            ${{ github.workspace }}/qemu/build/qemu-system-aarch64
+            ${{ github.workspace }}/qemu/build/qemu-system-x86_64
+            ${{ github.workspace }}/qemu/build/qemu-system-arm
+#            ${{ github.workspace }}/qemu/build/qemu-img
